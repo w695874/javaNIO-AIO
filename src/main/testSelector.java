@@ -1,5 +1,7 @@
 package main;
 
+import main.service.serverTcpService;
+import main.serviceImpl.serverTcpServiceImpl;
 import org.junit.Test;
 
 import java.net.InetSocketAddress;
@@ -18,8 +20,11 @@ public class testSelector {
 
     private testInterface  testInterface;
 
+    private serverTcpService serverTcpService;
+
     @Test
     public void testServerFunc() throws Exception{
+        serverTcpService=new serverTcpServiceImpl();
 
         /**
          * SocketChannel: Socket 的替代类, 支持阻塞通信与非阻塞通信.
@@ -62,10 +67,19 @@ public class testSelector {
                     {
                         SelectionKey key = iter.next();
                         if(key.isAcceptable()){
-                            System.out.println("得到连接");
+                            System.out.println("得到连接,开始处理");
+                            serverTcpService.acceptHandler(key);
+
                             // 新的连接
-                        } else if(key.isReadable()){
+                        }
+                        if(key.isReadable()){
+
+                            serverTcpService.readHandler(key);
                             // 可读
+                        }
+                        if (key.isWritable()){
+
+                            serverTcpService.writeHandler(key);
                         }
                         iter.remove(); //处理完事件的要从keys中删去
                         key.channel().close();
@@ -75,8 +89,6 @@ public class testSelector {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            }finally {
-
             }
         }).start();
 

@@ -21,7 +21,7 @@ public interface serverTcpService {
      * @param key key
      * @throws Exception 异常
      * */
-     void acceptRead(SelectionKey key) throws Exception;
+     void readHandler(SelectionKey key) throws Exception;
 
 
      /**
@@ -29,5 +29,5 @@ public interface serverTcpService {
      * @param key key
      * @throws Exception 异常
      * */
-     void acceptWrite(SelectionKey key) throws Exception;
+     void writeHandler(SelectionKey key) throws Exception;
 }
