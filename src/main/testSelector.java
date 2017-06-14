@@ -18,8 +18,6 @@ import java.util.Set;
  */
 public class testSelector {
 
-    private testInterface  testInterface;
-
     private serverTcpService serverTcpService;
 
     @Test
@@ -44,7 +42,7 @@ public class testSelector {
          * */
 
         System.out.println("服务端代码运行!!!");
-        SelectorProvider selectorProvider=SelectorProvider.provider();
+        SelectorProvider selectorProvider=SelectorProvider.provider();//windowsJDK直接用windows的IO机制,linux2.6以上epoll,否则poll
         Selector selector=selectorProvider.openSelector();
 
         ServerSocketChannel serverSocketChannel=ServerSocketChannel.open();
@@ -62,7 +60,6 @@ public class testSelector {
                     selector.select();
                     Set<SelectionKey> selectionKeys=selector.selectedKeys();
                     Iterator<SelectionKey> iter = selectionKeys.iterator();
-                    SocketChannel sc ;
                     while(iter.hasNext())
                     {
                         SelectionKey key = iter.next();
@@ -82,8 +79,8 @@ public class testSelector {
                             serverTcpService.writeHandler(key);
                         }
                         iter.remove(); //处理完事件的要从keys中删去
-                        key.channel().close();
                     }
+
                     System.out.println("select之后执行");
 
                 }
