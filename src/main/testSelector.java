@@ -21,8 +21,8 @@ public class testSelector {
     private serverTcpService serverTcpService;
 
     @Test
-    public void testServerFunc() throws Exception{
-        serverTcpService=new serverTcpServiceImpl();
+    public void testServerFunc() throws Exception {
+        serverTcpService = new serverTcpServiceImpl();
 
         /**
          * SocketChannel: Socket 的替代类, 支持阻塞通信与非阻塞通信.
@@ -42,43 +42,43 @@ public class testSelector {
          * */
 
         System.out.println("服务端代码运行!!!");
-        SelectorProvider selectorProvider=SelectorProvider.provider();//windowsJDK直接用windows的IO机制,linux2.6以上epoll,否则poll
-        Selector selector=selectorProvider.openSelector();
+        SelectorProvider selectorProvider = SelectorProvider.provider();//windowsJDK直接用windows的IO机制,linux2.6以上epoll,否则poll
+        Selector selector = selectorProvider.openSelector();
 
-        ServerSocketChannel serverSocketChannel=ServerSocketChannel.open();
+        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.socket().bind(new InetSocketAddress(6000));
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
 
-
-        new  Thread(()->{
+        new Thread(() -> {
             try {
-                System.out.println("线程中开始select");
-                while (true){
-                    System.out.println("select!!!");
+                while (true) {
+                    System.out.println("开始select");
                     selector.select();
-                    Set<SelectionKey> selectionKeys=selector.selectedKeys();
+                    System.out.println("select 到事件");
+                    Set<SelectionKey> selectionKeys = selector.selectedKeys();
                     Iterator<SelectionKey> iter = selectionKeys.iterator();
-                    while(iter.hasNext())
-                    {
+                    while (iter.hasNext()) {
                         SelectionKey key = iter.next();
-                        if(key.isAcceptable()){
-                            System.out.println("得到连接,开始处理");
-                            serverTcpService.acceptHandler(key);
-
-                            // 新的连接
-                        }
-                        if(key.isReadable()){
-
-                            serverTcpService.readHandler(key);
-                            // 可读
-                        }
-                        if (key.isWritable()){
-
-                            serverTcpService.writeHandler(key);
-                        }
                         iter.remove(); //处理完事件的要从keys中删去
+                        try {
+                            if (key.isAcceptable()) {
+                                System.out.println("得到连接,开始处理");
+                                serverTcpService.acceptHandler(key);
+
+                                // 新的连接
+                            }
+                            if (key.isReadable()) {
+
+                                serverTcpService.readHandler(key);
+                                // 可读
+                            }
+
+                        } catch (Exception e) {
+                            key.cancel();
+                        }
+                            //key.channel().close();//这句话直接关掉了server的channel
                     }
 
                     System.out.println("select之后执行");
@@ -93,16 +93,16 @@ public class testSelector {
     }
 
     @Test
-    public void testClientFunc() throws Exception{
+    public void testClientFunc() throws Exception {
 
         System.out.println("客户端代码运行!!!");
-        Selector selector=Selector.open();
-        SocketChannel socketChannel=SocketChannel.open(new InetSocketAddress(6000));
+        Selector selector = Selector.open();
+        SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress(6000));
         socketChannel.configureBlocking(false);
 
-        socketChannel.register(selector,SelectionKey.OP_CONNECT);
+        socketChannel.register(selector, SelectionKey.OP_CONNECT);
 
-        new  Thread(()->{
+        new Thread(() -> {
             System.out.println("线程中开始select");
             try {
                 selector.select();
@@ -117,18 +117,18 @@ public class testSelector {
 
 
     @Test
-    public void testE(){
+    public void testE() {
 
         System.out.println("aaaaaa");
-        new Thread(()->{
+        new Thread(() -> {
             System.out.println("线程运行");
         }).start();
 
         blockThread();
     }
 
-    public void blockThread(){
-        while (true);
+    public void blockThread() {
+        while (true) ;
     }
 
 

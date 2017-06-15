@@ -45,6 +45,7 @@ public class serverTcpServiceImpl implements serverTcpService {
 
         if(bytesRead==-1){
             // 没有读取到内容的情况
+            key.cancel();
             clientChannel.close();
         }
         else{
@@ -62,8 +63,10 @@ public class serverTcpServiceImpl implements serverTcpService {
             buffer= ByteBuffer.wrap(sendString.getBytes("GBK"));
             clientChannel.write(buffer);
 
+            clientChannel.close();//加上这句浏览器可以访问
+
             // 设置为下一次读取或是写入做准备
-            key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+           // key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
         }
     }
 
